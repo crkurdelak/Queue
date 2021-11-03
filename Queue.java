@@ -12,7 +12,7 @@ import java.util.NoSuchElementException;
 public class Queue<E> implements Iterable<E> {
     // TODO implement Queue
     // TODO remove all index-based stuff
-    // TODO throw correct exception (NoSuchElementException)
+
 
     private QueueNode<E> _head;
     private QueueNode<E> _tail;
@@ -32,35 +32,37 @@ public class Queue<E> implements Iterable<E> {
     /**
      * Adds the specified element to the end of this Queue.
      *
-     * @param element the element to be appended to this Queue
+     * @param element the element to be enqueued
      * @return true if this collection has changed as a result of the call
      */
-    public boolean add(E element) {
-        // TODO change to enqueue @ tail
-        LinkedListNode<E> newNode;
-        if (this.size() == 0) {
-            newNode = new LinkedListNode<>(element);
+    public boolean enqueue(E element) {
+        QueueNode<E> newNode;
+        if (isEmpty()) {
+            newNode = new QueueNode<>(element);
             _head = newNode;
             _tail = newNode;
         }
         else {
-            newNode = new LinkedListNode<>(element);
+            newNode = new QueueNode<>(element);
             newNode.setPrevious(_tail);
             _tail.setNext(newNode);
             _tail = newNode;
         }
-        _size++;
-        _modCount++;
-
         return true;
     }
 
 
-    // TODO implement enqueueAll
-    // for each element in elements, enqueue element
+    /**
+     * Enqueues all given elements.
+     *
+     * @param elements an iterable collection of elements to enqueue
+     */
+    public void enqueueAll(Iterable<E> elements) {
+        for (E element : elements) {
+            this.enqueue(element);
+        }
+    }
 
-
-    // TODO implement head() method
 
     /**
      * Returns the value at the head of this Queue without dequeueing it.
@@ -68,8 +70,12 @@ public class Queue<E> implements Iterable<E> {
      * @return the value at the head of this Queue.
      */
     public E head() {
-        // returns head
-        return _head.getValue();
+        if (!isEmpty()) {
+            return _head.getValue();
+        }
+        else {
+            throw new NoSuchElementException();
+        }
     }
 
 
@@ -77,57 +83,17 @@ public class Queue<E> implements Iterable<E> {
      * Removes and returns the head of this Queue.
      *
      * @return the value of the head of this Queue
+     * @throws NoSuchElementException if the Queue is empty
      */
     public E dequeue() {
-        // TODO change to dequeue @ head
-        if (this.isValidIndex(index) && !isEmpty()) {
-            LinkedListNode<E> oldNode;
-            LinkedListNode<E> prevNode;
-            LinkedListNode<E> nextNode;
-            E oldValue;
+        if (!isEmpty()) {
+            QueueNode<E> oldHead = _head;
+            _head = oldHead.getNext();
 
-            if (index == 0) {
-                oldNode = _head;
-                oldValue = oldNode.getValue();
-                if (this.size() > 1) {
-                    nextNode = oldNode.getNext();
-
-                    nextNode.setPrevious(null);
-                    _head = nextNode;
-                }
-                else {
-                    _head = null;
-                }
-            }
-            else if (index == size() - 1) {
-                oldNode = _tail;
-                oldValue = oldNode.getValue();
-                prevNode = oldNode.getPrevious();
-
-                prevNode.setNext(null);
-                _tail = prevNode;
-            }
-            else {
-                oldNode = this.seek(index);
-                oldValue = oldNode.getValue();
-                prevNode = oldNode.getPrevious();
-                nextNode = oldNode.getNext();
-
-                prevNode.setNext(nextNode);
-                nextNode.setPrevious(prevNode);
-            }
-
-            oldNode.setPrevious(null);
-            oldNode.setNext(null);
-            oldNode.setValue(null);
-
-            _size--;
-            _modCount++;
-
-            return oldValue;
+            return oldHead.getValue();
         }
         else {
-            throw new IndexOutOfBoundsException();
+            throw new NoSuchElementException(); // TODO see if this is right exception to throw
         }
     }
 
@@ -145,13 +111,13 @@ public class Queue<E> implements Iterable<E> {
 
 
     /**
-     * Returns true if this list contains no elements.
+     * Returns true if this Queue contains no elements.
      *
-     * @return true if this list contains no elements
-     * false if this list contains elements
+     * @return true if this Queue contains no elements
+     * false if this Queue contains elements
      */
     public boolean isEmpty() {
-        return (_size == 0);
+        return (_depth == 0);
     }
 
 
@@ -284,27 +250,12 @@ public class Queue<E> implements Iterable<E> {
      * Implements the Iterator<T> interface for the Queue class.
      */
     private class QueueIterator implements Iterator<E> {
-
         // TODO iterator dequeues repeatedly @ head
-
-        private QueueNode<E> _currentNode;
-
 
         /**
          * Constructs a new QueueIterator object.
          */
-        public LinkedListIterator(boolean reverse) {
-            if (reverse) {
-                // The index of the last element is size - 1 because indexing starts at 0.
-                _currentIndex = size() - 1;
-                _currentNode = _tail;
-            }
-            else {
-                _currentIndex = 0;
-                _currentNode = _head;
-            }
-            _reverse = reverse;
-            _modCountCopy = _modCount;
+        public QueueIterator() {
         }
 
         /**
@@ -314,17 +265,7 @@ public class Queue<E> implements Iterable<E> {
          * else return false
          */
         public boolean hasNext() {
-            if (_modCountCopy == _modCount) {
-                if (! _reverse) {
-                    return _currentIndex < _size;
-                }
-                else {
-                    return _currentIndex >= 0;
-                }
-            }
-            else {
-                throw new ConcurrentModificationException();
-            }
+            return (_head.getNext() != null);
         }
 
 
@@ -335,28 +276,7 @@ public class Queue<E> implements Iterable<E> {
          * @throws NoSuchElementException if the iteration has no more elements
          */
         public E next() {
-            if (_modCountCopy == _modCount) {
-                if (hasNext()) {
-                    E item = get(_currentIndex);
-                    if (item == null) {
-                        throw new NoSuchElementException();
-                    }
-                    if (!_reverse) {
-                        _currentNode = _currentNode.getNext();
-                        _currentIndex++;
-                    } else {
-                        _currentNode = _currentNode.getPrevious();
-                        _currentIndex--;
-                    }
-                    return item;
-                }
-                else {
-                    throw new NoSuchElementException();
-                }
-            }
-            else {
-                throw new ConcurrentModificationException();
-            }
+            return dequeue();
         }
     }
 }
