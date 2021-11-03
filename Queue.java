@@ -9,99 +9,34 @@ import java.util.NoSuchElementException;
  *
  * @author ckurdelak20@georgefox.edu
  */
-public class LinkedList<E> implements Iterable<E> {
+public class Queue<E> implements Iterable<E> {
+    // TODO implement Queue
+    // TODO remove all index-based stuff
+    // TODO throw correct exception (NoSuchElementException)
 
-    // for constructing iterators
-    private static final boolean REVERSED = true;
-    private static final boolean NOT_REVERSED = false;
+    private QueueNode<E> _head;
+    private QueueNode<E> _tail;
+    private int _depth;
 
-    private LinkedListNode<E> _head;
-    private LinkedListNode<E> _tail;
-    private int _size;
-    private long _modCount;
 
     /**
-     * Creates a new LinkedList.
+     * Creates a new Queue.
      */
-    public LinkedList() {
+    public Queue() {
         _head = null;
         _tail = null;
-        _size = 0;
-        _modCount = 0;
     }
 
 
-    /**
-     * Inserts the specified element at the specified position in this list. Shifts the element
-     * currently at that position (if any) and any subsequent elements to the right (adds one to
-     * their indices).
-     *
-     * Maintains constant-time access to head and tail.
-     *
-     * @param index the index where the element will be inserted
-     * @param element the element to be inserted
-     * @throws IndexOutOfBoundsException if the specified index is out of range
-     */
-    public void add(int index, E element) {
-        LinkedListNode<E> newNode = new LinkedListNode<>(element);
-        LinkedListNode<E> oldNode;
-        LinkedListNode<E> prevNode;
-
-        if (index <= this.size() && index >= 0) {
-            if (this.size() == 0) {
-                _head = newNode;
-                _tail = newNode;
-            } else {
-                if (index == 0) {
-                    oldNode = _head; // there is no previous node but there is a next node
-                    // (unless size == 1)
-                    newNode.setNext(oldNode);
-                    oldNode.setPrevious(newNode);
-                    _head = newNode;
-                } else {
-                    if (index == this.size()) {
-                        oldNode = _tail; // there is no next node but there is a previous node
-                        // (unless size == 1)
-                    } else {
-                        oldNode = this.seek(index); // there is a previous and a next node bc
-                        // oldNode is neither the head nor the tail
-                    }
-
-                    prevNode = oldNode.getPrevious();
-                    if (prevNode != null) {
-                        prevNode.setNext(newNode);
-                        newNode.setPrevious(prevNode);
-                    }
-                    else {
-                        newNode.setPrevious(_head);
-                    }
-
-                    newNode.setNext(oldNode);
-                    oldNode.setPrevious(newNode);
-
-                    if (index == this.size()) {
-                        _tail = newNode;
-                    }
-
-                }
-            }
-            _size ++;
-            _modCount++;
-        }
-        else {
-            throw new IndexOutOfBoundsException();
-        }
-    }
-
 
     /**
-     * Appends the specified element to the end of this list.
+     * Adds the specified element to the end of this Queue.
      *
-     * @param element the element to be appended to this list
+     * @param element the element to be appended to this Queue
      * @return true if this collection has changed as a result of the call
-     * @throws IndexOutOfBoundsException if the specified index is out of range
      */
     public boolean add(E element) {
+        // TODO change to enqueue @ tail
         LinkedListNode<E> newNode;
         if (this.size() == 0) {
             newNode = new LinkedListNode<>(element);
@@ -121,105 +56,30 @@ public class LinkedList<E> implements Iterable<E> {
     }
 
 
+    // TODO implement enqueueAll
+    // for each element in elements, enqueue element
+
+
+    // TODO implement head() method
+
     /**
-     * Removes all the elements from this list. The list will be empty after this call returns.
+     * Returns the value at the head of this Queue without dequeueing it.
+     *
+     * @return the value at the head of this Queue.
      */
-    public void clear() {
-        // let go of head and tail
-        if (_head != null && _tail != null) {
-            _head.setValue(null);
-            _tail.setValue(null);
-            _size = 0;
-            _modCount++;
-        }
+    public E head() {
+        // returns head
+        return _head.getValue();
     }
 
 
     /**
-     * Returns the element at the specified position in this list.
+     * Removes and returns the head of this Queue.
      *
-     * Maintains constant-time access to head and tail.
-     *
-     * @param index the index of the element to return
-     * @return the element at the specified position in this list
-     * @throws IndexOutOfBoundsException if the index is out of range
+     * @return the value of the head of this Queue
      */
-    public E get(int index) {
-        if (this.isValidIndex(index)) {
-
-        LinkedListNode<E> node;
-
-            if (index == 0) {
-                node = _head;
-            } else if (index == this.size() - 1) {
-                node = _tail;
-            } else {
-                node = this.seek(index);
-            }
-
-            return node.getValue();
-        }
-        else {
-            throw new IndexOutOfBoundsException();
-        }
-    }
-
-
-    /**
-     * Returns the index of the first occurrence of the specified element in this list,
-     * or -1 if this list does not contain the element.
-     *
-     * More formally, returns the lowest index i such that
-     * Objects.equals(o, get(i)), or -1 if there is no such index.
-     *
-     * @param element the element to search for
-     * @return the index of the first occurrence of the specified element in this list,
-     * or -1 if this list does not contain the element.
-     */
-    public int indexOf(E element) {
-        Iterator<E> iter = iterator();
-        boolean found = false;
-        E currentItem;
-        int index = 0;
-
-        while (iter.hasNext() && !found) {
-            currentItem = iter.next();
-            found = (currentItem == element);
-            if (!found) {
-                index++;
-            }
-        }
-
-        if (!found) {
-            index = -1;
-        }
-
-        return index;
-    }
-
-
-
-    /**
-     * Returns true if this list contains no elements.
-     *
-     * @return true if this list contains no elements
-     * false if this list contains elements
-     */
-    public boolean isEmpty() {
-        return (_size == 0);
-    }
-
-
-    /**
-     * Removes and returns the element from the specified position in this list.
-     *
-     * Maintains constant-time access to head and tail
-     *
-     * @param index the index of the element to be removed
-     * @return the element that was removed from the list
-     * @throws IndexOutOfBoundsException if the specified index is out of range
-     */
-    public E remove(int index) {
+    public E dequeue() {
+        // TODO change to dequeue @ head
         if (this.isValidIndex(index) && !isEmpty()) {
             LinkedListNode<E> oldNode;
             LinkedListNode<E> prevNode;
@@ -273,38 +133,25 @@ public class LinkedList<E> implements Iterable<E> {
 
 
     /**
-     * Replaces the element at the specified position in this list with the specified element.
-     *
-     * Maintains constant-time access to head and tail.
-     *
-     * @param index the index of the element to replace
-     * @param element the element to be stored at the specified position
-     * @return the element previously at the specified position
-     * @throws IndexOutOfBoundsException if the specified index is out of range
+     * Removes all the elements from this Queue. The Queue will be empty after this call returns.
      */
-    public E set(int index, E element) {
-        LinkedListNode<E> node;
-        E oldValue;
-        if (this.isValidIndex(index)) {
-            if (index == 0) {
-                node = _head;
-
-            }
-            else if (index == this.size()) {
-                node = _tail;
-            }
-            else {
-                node = this.seek(index);
-            }
-
-            oldValue = node.getValue();
-            node.setValue(element);
+    public void clear() {
+        if (_head != null && _tail != null) {
+            _head = null;
+            _tail = null;
+            _depth = 0;
         }
-        else {
-            throw new IndexOutOfBoundsException();
-        }
+    }
 
-        return oldValue;
+
+    /**
+     * Returns true if this list contains no elements.
+     *
+     * @return true if this list contains no elements
+     * false if this list contains elements
+     */
+    public boolean isEmpty() {
+        return (_size == 0);
     }
 
 
@@ -313,8 +160,8 @@ public class LinkedList<E> implements Iterable<E> {
      *
      * @return the number of elements in this list
      */
-    public int size() {
-        return _size;
+    public int depth() {
+        return _depth;
     }
 
 
@@ -324,46 +171,7 @@ public class LinkedList<E> implements Iterable<E> {
      * @return a new LinkedListIterator object that iterates from head to tail
      */
     public Iterator<E> iterator() {
-        return new LinkedListIterator(NOT_REVERSED);
-    }
-
-
-    /**
-     * Returns a new LinkedListIterator object that iterates from tail to head.
-     *
-     * @return a new LinkedListIterator object that iterates from tail to head
-     */
-    public Iterator<E> reverseIterator() {
-        return new LinkedListIterator(REVERSED);
-    }
-
-
-    /**
-     * Checks if the given index is valid.
-     *
-     * An index is only invalid if it is less than 0 or greater than the size of the list.
-     *
-     * @param index the index to check
-     * @return true if the index is valid; else return false
-     */
-    private boolean isValidIndex(int index) {
-        return (index < this.size() && index >= 0);
-    }
-
-
-    /**
-     * Returns the node at the given index.
-     *
-     * @param index the index to seek to
-     * @return the node at the given index
-     */
-    private LinkedListNode<E> seek(int index) {
-        LinkedListNode<E> currentNode = _head;
-
-        for (int i = 0; i < index; i++) {
-            currentNode = currentNode.getNext();
-        }
-        return currentNode;
+        return new QueueIterator();
     }
 
 
@@ -373,38 +181,38 @@ public class LinkedList<E> implements Iterable<E> {
      *
      * @param <E> the type of element stored in this node
      */
-    private class LinkedListNode<E> {
+    private class QueueNode<E> {
 
         E _value;
-        LinkedListNode<E> _prev;
-        LinkedListNode<E> _next;
+        QueueNode<E> _prev;
+        QueueNode<E> _next;
 
         /**
-         * Constructs a new LinkedListNode.
+         * Constructs a new QueueNode.
          */
-        public LinkedListNode() {
+        public QueueNode() {
             this(null);
         }
 
 
         /**
-         * Constructs a new LinkedListNode with the given value.
+         * Constructs a new QueueNode with the given value.
          *
-         * @param value the value stored in this LinkedListNode
+         * @param value the value stored in this QueueNode
          */
-        public LinkedListNode(E value) {
+        public QueueNode(E value) {
             this(value, null, null);
         }
 
 
         /**
-         * Constructs a new LinkedListNode with the given value.
+         * Constructs a new QueueNode with the given value.
          *
-         * @param value the value stored in this LinkedListNode
-         * @param prev the previous LinkedListNode
-         * @param next the next LinkedListNode
+         * @param value the value stored in this QueueNode
+         * @param prev the previous QueueNode
+         * @param next the next QueueNode
          */
-        public LinkedListNode(E value, LinkedListNode<E> prev, LinkedListNode<E> next) {
+        public QueueNode(E value, QueueNode<E> prev, QueueNode<E> next) {
             _value = value;
             _prev = prev;
             _next = next;
@@ -412,9 +220,9 @@ public class LinkedList<E> implements Iterable<E> {
 
 
         /**
-         * Returns the value of this LinkedListNode.
+         * Returns the value of this QueueNode.
          *
-         * @return the value of this LinkedListNode
+         * @return the value of this QueueNode
          */
         public E getValue() {
             return _value;
@@ -422,21 +230,21 @@ public class LinkedList<E> implements Iterable<E> {
 
 
         /**
-         * Returns the previous LinkedListNode.
+         * Returns the previous QueueNode.
          *
-         * @return the previous LinkedListNode
+         * @return the previous QueueNode
          */
-        public LinkedListNode<E> getPrevious() {
+        public QueueNode<E> getPrevious() {
             return _prev;
         }
 
 
         /**
-         * Returns the next LinkedListNode.
+         * Returns the next QueueNode.
          *
-         * @return the next LinkedListNode
+         * @return the next QueueNode
          */
-        public LinkedListNode<E> getNext() {
+        public QueueNode<E> getNext() {
             return _next;
         }
 
@@ -456,7 +264,7 @@ public class LinkedList<E> implements Iterable<E> {
          *
          * @param prev the new previous node
          */
-        public void setPrevious(LinkedListNode<E> prev) {
+        public void setPrevious(QueueNode<E> prev) {
             _prev = prev;
         }
 
@@ -466,28 +274,24 @@ public class LinkedList<E> implements Iterable<E> {
          *
          * @param next the new next node
          */
-        public void setNext(LinkedListNode<E> next) {
+        public void setNext(QueueNode<E> next) {
             _next = next;
         }
     }
 
 
     /**
-     * Implements the Iterator<T> interface for the LinkedList class.
-     *
-     * Uses fail-fast iteration.
+     * Implements the Iterator<T> interface for the Queue class.
      */
-    private class LinkedListIterator implements Iterator<E> {
+    private class QueueIterator implements Iterator<E> {
 
-        private int _currentIndex;
-        private LinkedListNode<E> _currentNode;
-        private final boolean _reverse;
-        private final long _modCountCopy;
+        // TODO iterator dequeues repeatedly @ head
+
+        private QueueNode<E> _currentNode;
+
 
         /**
-         * Constructs a new LinkedListIterator object.
-         *
-         * @param reverse true if this iterator is a reverse iterator, else false
+         * Constructs a new QueueIterator object.
          */
         public LinkedListIterator(boolean reverse) {
             if (reverse) {
@@ -504,13 +308,10 @@ public class LinkedList<E> implements Iterable<E> {
         }
 
         /**
-         * Returns true if the current index is less than the size of the LinkedList, else
-         * returns false.
+         * Returns true if the current head has a next, else returns false.
          *
-         * @return true if the current index is less than the size of the LinkedList
+         * @return true if the current head has a next
          * else return false
-         * @throws ConcurrentModificationException if the list has been modified since iteration
-         * started
          */
         public boolean hasNext() {
             if (_modCountCopy == _modCount) {
@@ -531,8 +332,6 @@ public class LinkedList<E> implements Iterable<E> {
          * Returns the next element in this iteration.
          *
          * @return the next element in this iteration
-         * @throws ConcurrentModificationException if the list has been modified since iteration
-         * started
          * @throws NoSuchElementException if the iteration has no more elements
          */
         public E next() {
