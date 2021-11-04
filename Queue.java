@@ -10,9 +10,6 @@ import java.util.NoSuchElementException;
  * @author ckurdelak20@georgefox.edu
  */
 public class Queue<E> implements Iterable<E> {
-    // TODO implement Queue
-    // TODO remove all index-based stuff
-
 
     private QueueNode<E> _head;
     private QueueNode<E> _tail;
@@ -26,7 +23,6 @@ public class Queue<E> implements Iterable<E> {
         _head = null;
         _tail = null;
     }
-
 
 
     /**
@@ -48,6 +44,7 @@ public class Queue<E> implements Iterable<E> {
             _tail.setNext(newNode);
             _tail = newNode;
         }
+        _depth ++;
         return true;
     }
 
@@ -68,6 +65,7 @@ public class Queue<E> implements Iterable<E> {
      * Returns the value at the head of this Queue without dequeueing it.
      *
      * @return the value at the head of this Queue.
+     * @throws NoSuchElementException if the Queue is empty
      */
     public E head() {
         if (!isEmpty()) {
@@ -90,6 +88,7 @@ public class Queue<E> implements Iterable<E> {
             QueueNode<E> oldHead = _head;
             _head = oldHead.getNext();
 
+            _depth --;
             return oldHead.getValue();
         }
         else {
@@ -102,11 +101,9 @@ public class Queue<E> implements Iterable<E> {
      * Removes all the elements from this Queue. The Queue will be empty after this call returns.
      */
     public void clear() {
-        if (_head != null && _tail != null) {
-            _head = null;
-            _tail = null;
-            _depth = 0;
-        }
+        _head = null;
+        _tail = null;
+        _depth = 0;
     }
 
 
@@ -149,9 +146,9 @@ public class Queue<E> implements Iterable<E> {
      */
     private class QueueNode<E> {
 
-        E _value;
-        QueueNode<E> _prev;
-        QueueNode<E> _next;
+        private E _value;
+        private QueueNode<E> _prev;
+        private QueueNode<E> _next;
 
         /**
          * Constructs a new QueueNode.
@@ -250,22 +247,23 @@ public class Queue<E> implements Iterable<E> {
      * Implements the Iterator<T> interface for the Queue class.
      */
     private class QueueIterator implements Iterator<E> {
-        // TODO iterator dequeues repeatedly @ head
 
         /**
          * Constructs a new QueueIterator object.
+         *
          */
         public QueueIterator() {
+            // No internal state is needed because the top is always consumed during iteration.
         }
 
         /**
-         * Returns true if the current head has a next, else returns false.
+         * Returns true if there are more elements in this iteration, else returns false.
          *
-         * @return true if the current head has a next
+         * @return true if there are more elements in this iteration
          * else return false
          */
         public boolean hasNext() {
-            return (_head.getNext() != null);
+            return (!isEmpty());
         }
 
 
