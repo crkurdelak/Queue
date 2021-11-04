@@ -3,7 +3,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * A list of elements of type E.
+ * A queue of elements of type E.
  *
  * @param <E> the type of elements in this list
  *
