@@ -274,7 +274,12 @@ public class Queue<E> implements Iterable<E> {
          * @throws NoSuchElementException if the iteration has no more elements
          */
         public E next() {
-            return dequeue();
+            if (hasNext()) {
+                return dequeue();
+            }
+            else {
+                throw new NoSuchElementException();
+            }
         }
     }
 }
