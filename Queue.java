@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 /**
  * A queue of elements of type E.
  *
- * @param <E> the type of elements in this list
+ * @param <E> the type of elements in this Queue
  *
  * @author ckurdelak20@georgefox.edu
  */
@@ -119,9 +119,9 @@ public class Queue<E> implements Iterable<E> {
 
 
     /**
-     * Returns the number of elements in this list.
+     * Returns the number of elements in this Queue.
      *
-     * @return the number of elements in this list
+     * @return the number of elements in this Queue
      */
     public int depth() {
         return _depth;
@@ -129,9 +129,9 @@ public class Queue<E> implements Iterable<E> {
 
 
     /**
-     * Returns a new LinkedListIterator object that iterates from head to tail.
+     * Returns a new QueueIterator object that iterates from head to tail.
      *
-     * @return a new LinkedListIterator object that iterates from head to tail
+     * @return a new QueueIterator object that iterates from head to tail
      */
     public Iterator<E> iterator() {
         return new QueueIterator();
@@ -139,7 +139,7 @@ public class Queue<E> implements Iterable<E> {
 
 
     /**
-     * A node that stores a single element in a LinkedList as well as references to its adjacent
+     * A node that stores a single element in a Queue as well as references to its adjacent
      * nodes.
      *
      * @param <E> the type of element stored in this node
