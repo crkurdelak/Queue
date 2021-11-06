@@ -256,6 +256,7 @@ public class Queue<E> implements Iterable<E> {
             // No internal state is needed because the top is always consumed during iteration.
         }
 
+
         /**
          * Returns true if there are more elements in this iteration, else returns false.
          *
