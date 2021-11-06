@@ -92,7 +92,7 @@ public class Queue<E> implements Iterable<E> {
             return oldHead.getValue();
         }
         else {
-            throw new NoSuchElementException(); // TODO see if this is right exception to throw
+            throw new NoSuchElementException();
         }
     }
 
